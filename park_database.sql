@@ -4,21 +4,28 @@ use park_database;
 
 
 CREATE TABLE employee_demographics (
-    employee_id INT NOT NULL,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    gender VARCHAR(10),
+    employee_id INT NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    gender ENUM('Male', 'Female', 'Other') NOT NULL,
     phone_number VARCHAR(10),
     email VARCHAR(50) UNIQUE,
-    birth_date DATE,
-    hire_date DATE,
+    birth_date DATE NOT NULL,
+    hire_date DATE NOT NULL,
     termination_date DATE,
-    employee_type VARCHAR(10),
+    employee_type VARCHAR(10) NOT NULL,
     location_id INT,
     supervisor_id INT,
-    hourly_rate FLOAT,
-    is_active BOOL,
-    PRIMARY KEY (employee_id)
+    hourly_rate DECIMAL(10, 2), -- Force rounding to 2 decimals
+    is_active BOOL DEFAULT TRUE,
+    -- Keys
+    PRIMARY KEY (employee_id),
+    FOREIGN KEY (location_id) REFERENCES location(location_id),
+    FOREIGN KEY (supervisor_id) REFERENCES employee_demographics(employee_id),
+    -- Constraints
+    CONSTRAINT chk_dates CHECK (termination_date IS NULL OR termination_date >= hire_date), -- force termination date to be not null for active employees, OR if terminated, the termination date must be after hire date
+    CONSTRAINT chk_hire_age CHECK (hire_date >= DATE_ADD(birth_date, INTERVAL 16 YEAR)), -- force employeees to be at least 16 years old (no child labor allowed)
+    CONSTRAINT chk_rate_positive CHECK (hourly_rate >= 0) -- force pay to not be negative 
 );
 
     
