@@ -30,14 +30,22 @@ CREATE TABLE employee_demographics (
 
     
 CREATE TABLE location (
-    location_id INT NOT NULL,
-    location_name VARCHAR(20),
+    location_id INT NOT NULL AUTO_INCREMENT,
+    location_name VARCHAR(50) NOT NULL UNIQUE,
     summary VARCHAR(250),
     manager_id INT,
     manager_start DATE,
+    -- keys
     PRIMARY KEY (location_id),
     FOREIGN KEY (manager_id)
         REFERENCES employee_demographics (employee_id)
+        ON DELETE SET NULL -- if a manager is deleted, the manager id for the location is Null
+    -- constraints
+    CONSTRAINT chk_manager_logic CHECK (
+        (manager_id IS NULL AND manager_start IS NULL) -- manager id cannot be null if there is a maanger start date
+        OR 
+        (manager_id IS NOT NULL AND manager_start IS NOT NULL) -- vice versa
+    )
 );
 
 
