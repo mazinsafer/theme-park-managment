@@ -20,7 +20,7 @@ CREATE TABLE employee_demographics (
     is_active BOOL DEFAULT TRUE,
     -- Keys
     PRIMARY KEY (employee_id),
-    FOREIGN KEY (location_id) REFERENCES location(location_id),
+    -- FOREIGN KEY (location_id) REFERENCES location(location_id),
     FOREIGN KEY (supervisor_id) REFERENCES employee_demographics(employee_id),
     -- Constraints
     CONSTRAINT chk_dates CHECK (termination_date IS NULL OR termination_date >= hire_date), -- force termination date to be not null for active employees, OR if terminated, the termination date must be after hire date
@@ -39,7 +39,7 @@ CREATE TABLE location (
     PRIMARY KEY (location_id),
     FOREIGN KEY (manager_id)
         REFERENCES employee_demographics (employee_id)
-        ON DELETE SET NULL -- if a manager is deleted, the manager id for the location is Null
+        -- ON DELETE SET NULL -- if a manager is deleted, the manager id for the location is Null
     -- constraints
     CONSTRAINT chk_manager_logic CHECK (
         (manager_id IS NULL AND manager_start IS NULL) -- manager id cannot be null if there is a maanger start date
@@ -48,6 +48,8 @@ CREATE TABLE location (
     )
 );
 
+ALTER TABLE employee_demographics
+ADD FOREIGN KEY (location_id) REFERENCES location (location_id);
 
 CREATE TABLE rides (
     ride_id INT NOT NULL,
