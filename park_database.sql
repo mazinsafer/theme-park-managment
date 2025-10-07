@@ -182,6 +182,7 @@ CREATE TABLE daily_ride (
     FOREIGN KEY (ride_id)
         REFERENCES rides (ride_id),
     FOREIGN KEY (dat_date)
-        REFERENCES daily_stats (date_rec)
+        REFERENCES daily_stats (date_rec),
+    CONSTRAINT chk_ride_count_positive CHECK (ride_count >= 0)
 );
 
