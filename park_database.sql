@@ -92,14 +92,19 @@ CREATE TABLE maintenance (
 );
 
 CREATE TABLE membership (
-    membership_id INT NOT NULL,
-    first_name VARCHAR(25),
-    last_name VARCHAR(25),
+    membership_id INT NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(25) NOT NULL,
+    last_name VARCHAR(25) NOT NULL,
     email VARCHAR(50) UNIQUE,
     phone_number VARCHAR(10),
-    date_of_birth DATE,
-    member_type VARCHAR(10),
-    PRIMARY KEY (membership_id)
+    date_of_birth DATE NOT NULL,
+    member_type ENUM('Individual', 'Family', 'Gold', 'Platinum') NOT NULL,
+    start_date DATE NOT NULL DEFAULT (CURDATE()),
+	end_date DATE NOT NULL,
+    -- keys
+    PRIMARY KEY (membership_id),
+    -- constraints
+    CONSTRAINT chk_membership_dates CHECK (end_date > start_date)
 );
 
 
