@@ -74,7 +74,7 @@ CREATE TABLE maintenance (
     end_date DATE,
     summary VARCHAR(250),
     employee_id INT,
-    cost FLOAT,
+    cost DECIMAL(10,2),
     ride_status VARCHAR(10),
     PRIMARY KEY (maintenance_id),
     FOREIGN KEY (ride_id)
@@ -102,8 +102,8 @@ CREATE TABLE visits (
     visit_date DATETIME,
     exit_time TIME,
     ticket_type VARCHAR(10),
-    ticket_price FLOAT,
-    discount_amount FLOAT,
+    ticket_price DECIMAL(10,2),
+    discount_amount DECIMAL(10,2),
     membership_type VARCHAR(10),
     PRIMARY KEY (visit_id),
     FOREIGN KEY (membership_id)
@@ -129,7 +129,7 @@ CREATE TABLE event_promotions (
     event_type VARCHAR(10),
     start_date DATE,
     end_date DATE,
-    discount_percent FLOAT,
+    discount_percent DECIMAL(10,2),
     summary VARCHAR(250),
     PRIMARY KEY (event_id)
 );
@@ -163,7 +163,7 @@ CREATE TABLE item (
     item_id INT NOT NULL,
     item_type VARCHAR(20),
     item_name VARCHAR(20),
-    price FLOAT,
+    price DECIMAL(10,2),
     summary VARCHAR(250),
     PRIMARY KEY (item_id),
     CONSTRAINT chk_price_positive CHECK (price >= 0)
