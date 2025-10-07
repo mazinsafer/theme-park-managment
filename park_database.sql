@@ -121,12 +121,15 @@ CREATE TABLE visits (
 
 
 CREATE TABLE weather_events (
-    weather_id INT NOT NULL,
-    event_date DATETIME,
+    weather_id INT NOT NULL AUTO_INCREMENT,
+    event_date DATETIME NOT NULL,
     end_time DATETIME,
-    weather_type VARCHAR(10),
-    park_closure BOOL,
-    PRIMARY KEY (weather_id)
+    weather_type ENUM('Rain', 'Thunderstorm', 'Tornado Warning', 'Heatwave', 'Other') NOT NULL,
+    park_closure BOOL NOT NULL DEFAULT FALSE,
+    -- keys
+    PRIMARY KEY (weather_id),
+    -- constraints
+    CONSTRAINT chk_weather_times CHECK (end_time IS NULL OR end_time >= event_date)
 );
 
 
@@ -149,7 +152,7 @@ CREATE TABLE event_promotions (
 CREATE TABLE daily_stats (
     date_rec DATE NOT NULL,
     visitor_count INT,
-    PRIMARY KEY (date_rec)
+    PRIMARY KEY (date_rec),
 	CONSTRAINT chk_count_positive CHECK (visitor_count >= 0)
 );
 
