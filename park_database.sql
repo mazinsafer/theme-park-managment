@@ -93,8 +93,8 @@ CREATE TABLE maintenance (
 
 CREATE TABLE membership (
     membership_id INT NOT NULL,
-    first_name VARCHAR(10),
-    last_name VARCHAR(10),
+    first_name VARCHAR(25),
+    last_name VARCHAR(25),
     email VARCHAR(50) UNIQUE,
     phone_number VARCHAR(10),
     date_of_birth DATE,
