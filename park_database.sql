@@ -52,7 +52,7 @@ ALTER TABLE employee_demographics
 ADD FOREIGN KEY (location_id) REFERENCES location (location_id);
 
 CREATE TABLE rides (
-    ride_id INT NOT NULL,
+    ride_id INT NOT NULL AUTO_INCREMENT,
     ride_name VARCHAR(20) NOT NULL,
     ride_type VARCHAR(10),
     ride_status ENUM("OPEN", "CLOSED", "BROKEN"),
@@ -109,7 +109,7 @@ CREATE TABLE membership (
 
 
 CREATE TABLE visits (
-    visit_id INT NOT NULL,
+    visit_id INT NOT NULL AUTO_INCREMENT,
     membership_id INT,
     visit_date DATETIME,
     exit_time TIME,
