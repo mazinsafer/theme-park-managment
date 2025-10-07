@@ -55,7 +55,7 @@ CREATE TABLE rides (
     ride_id INT NOT NULL,
     ride_name VARCHAR(20) NOT NULL,
     ride_type VARCHAR(10),
-    ride_status VARCHAR(10),
+    ride_status ENUM("OPEN", "CLOSED", "BROKEN"),
     max_weight INT,
     min_height INT,
     capacity INT,
