@@ -175,7 +175,7 @@ CREATE TABLE vendors (
 CREATE TABLE item (
     item_id INT NOT NULL AUTO_INCREMENT,
     item_type VARCHAR(20),
-    item_name VARCHAR(20),
+    item_name VARCHAR(50),
     price DECIMAL(10,2),
     summary VARCHAR(250),
     PRIMARY KEY (item_id),
