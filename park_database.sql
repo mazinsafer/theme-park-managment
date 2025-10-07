@@ -147,15 +147,15 @@ CREATE TABLE vendors (
     vendor_name VARCHAR(100) NOT NULL UNIQUE,
     location_id INT,
     manager_id INT,
-    --- keys
+    -- keys
     PRIMARY KEY (vendor_id),
     FOREIGN KEY (location_id)
-        REFERENCES location (location_id),
-        ON DELETE SET NULL,
+        REFERENCES location (location_id)
+        ON DELETE SET NULL
         ON UPDATE CASCADE,
     FOREIGN KEY (manager_id)
-        REFERENCES employee_demographics (employee_id),
-        ON DELETE SET NULL,
+        REFERENCES employee_demographics (employee_id)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -186,11 +186,11 @@ CREATE TABLE daily_ride (
     dat_date DATE NOT NULL,
     ride_count INT UNSIGNED DEFAULT 0,
     run_count INT UNSIGNED DEFAULT 0,
-    --- keys
+    -- keys
     PRIMARY KEY (ride_id , dat_date),
     FOREIGN KEY (ride_id) REFERENCES rides (ride_id),
-    FOREIGN KEY (dat_date) REFERENCES daily_stats (date_rec)
-    --- constraints
+    FOREIGN KEY (dat_date) REFERENCES daily_stats (date_rec),
+    -- constraints
     CONSTRAINT chk_ride_count_positive CHECK (ride_count >= 0),
     CONSTRAINT chk_run_count_positive CHECK (run_count >= 0)
 );
