@@ -157,7 +157,8 @@ CREATE TABLE item (
     item_name VARCHAR(20),
     price FLOAT,
     summary VARCHAR(250),
-    PRIMARY KEY (item_id)
+    PRIMARY KEY (item_id),
+    CONSTRAINT chk_price_positive CHECK (price >= 0)
 );
 
 
@@ -169,7 +170,8 @@ CREATE TABLE inventory (
     FOREIGN KEY (item_id)
         REFERENCES item (item_id),
     FOREIGN KEY (vendor_id)
-        REFERENCES vendors (vendor_id)
+        REFERENCES vendors (vendor_id),
+    CONSTRAINT chk_count_positive CHECK (count >= 0)
 );
 
 CREATE TABLE daily_ride (
