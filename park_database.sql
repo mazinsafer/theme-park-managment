@@ -180,7 +180,7 @@ CREATE TABLE vendors (
 );
 
 CREATE TABLE item (
-    item_id INT NOT NULL,
+    item_id INT NOT NULL AUTO_INCREMENT,
     item_type VARCHAR(20),
     item_name VARCHAR(20),
     price DECIMAL(10,2),
