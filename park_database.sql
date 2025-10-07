@@ -38,7 +38,7 @@ CREATE TABLE location (
     -- keys
     PRIMARY KEY (location_id),
     FOREIGN KEY (manager_id)
-        REFERENCES employee_demographics (employee_id)
+        REFERENCES employee_demographics (employee_id),
         -- ON DELETE SET NULL -- if a manager is deleted, the manager id for the location is Null
     -- constraints
     CONSTRAINT chk_manager_logic CHECK (
