@@ -131,14 +131,18 @@ CREATE TABLE weather_events (
 
 
 CREATE TABLE event_promotions (
-    event_id INT NOT NULL,
-    event_name VARCHAR(20),
-    event_type VARCHAR(10),
-    start_date DATE,
-    end_date DATE,
-    discount_percent DECIMAL(10,2),
+    event_id INT NOT NULL AUTO_INCREMENT,
+    event_name VARCHAR(100) NOT NULL UNIQUE,
+    event_type ENUM('Holiday', 'Seasonal', 'Special', 'Weekend') NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    discount_percent DECIMAL(10,2) NOT NULL,
     summary VARCHAR(250),
-    PRIMARY KEY (event_id)
+    -- keys
+    PRIMARY KEY (event_id),
+    -- constraints
+    CONSTRAINT chk_event_dates CHECK (end_date >= start_date),
+    CONSTRAINT chk_discount_percent CHECK (discount_percent BETWEEN 0 AND 100)
 );
 
 
