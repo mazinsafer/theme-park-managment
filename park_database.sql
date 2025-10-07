@@ -107,9 +107,9 @@ CREATE TABLE visits (
     membership_type VARCHAR(10),
     PRIMARY KEY (visit_id),
     FOREIGN KEY (membership_id)
-        REFERENCES membership (membership_id)
+        REFERENCES membership (membership_id),
     CONSTRAINT chk_positive_prices CHECK (ticket_price >= 0 AND discount_amount >= 0),
-    CONSTRAINT chk_valid_discount CHECK (discount_amount <= ticket_price),
+    CONSTRAINT chk_valid_discount CHECK (discount_amount <= ticket_price)
 );
 
 
