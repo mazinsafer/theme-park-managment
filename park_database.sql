@@ -153,7 +153,7 @@ CREATE TABLE daily_stats (
     date_rec DATE NOT NULL,
     visitor_count INT,
     PRIMARY KEY (date_rec),
-	CONSTRAINT chk_count_positive CHECK (visitor_count >= 0)
+	CONSTRAINT chk_stats_count_positive CHECK (visitor_count >= 0)
 );
 
 
@@ -181,7 +181,7 @@ CREATE TABLE item (
     price DECIMAL(10,2),
     summary VARCHAR(250),
     PRIMARY KEY (item_id),
-    CONSTRAINT chk_price_positive CHECK (price >= 0)
+    CONSTRAINT chk_item_price_positive CHECK (price >= 0)
 );
 
 CREATE TABLE inventory (
