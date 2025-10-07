@@ -68,11 +68,10 @@ CREATE TABLE rides (
     CONSTRAINT chk_capacity CHECK (capacity >= 0)
 );
     
-    
 CREATE TABLE maintenance (
-    maintenance_id INT NOT NULL,
-    ride_id INT,
-    report_date DATE,
+    maintenance_id INT NOT NULL AUTO_INCREMENT,
+    ride_id INT NOT NULL,
+    report_date DATE NOT NULL DEFAULT (CURDATE()),
     start_date DATE,
     end_date DATE,
     summary VARCHAR(250),
@@ -81,11 +80,16 @@ CREATE TABLE maintenance (
     ride_status VARCHAR(10),
     PRIMARY KEY (maintenance_id),
     FOREIGN KEY (ride_id)
-        REFERENCES rides (ride_id),
-    FOREIGN KEY (employee_id)
+        REFERENCES rides (ride_id)
+        ON DELETE CASCADE,
+	FOREIGN KEY (employee_id)
         REFERENCES employee_demographics (employee_id)
+        ON DELETE SET NULL,
+    -- constraints
+    CONSTRAINT chk_maintenance_dates CHECK (start_date IS NULL OR start_date >= report_date),
+    CONSTRAINT chk_completion_date CHECK (end_date IS NULL OR end_date >= start_date),
+    CONSTRAINT chk_cost_positive CHECK (cost IS NULL OR cost >= 0)
 );
-
 
 CREATE TABLE membership (
     membership_id INT NOT NULL,
