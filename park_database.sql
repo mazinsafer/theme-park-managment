@@ -46,8 +46,8 @@ ADD FOREIGN KEY (location_id) REFERENCES location (location_id);
 
 CREATE TABLE rides (
     ride_id INT NOT NULL AUTO_INCREMENT,
-    ride_name VARCHAR(20) NOT NULL,
-    ride_type VARCHAR(10),
+    ride_name VARCHAR(50) NOT NULL,
+    ride_type VARCHAR(20),
     ride_status ENUM("OPEN", "CLOSED", "BROKEN"),
     max_weight INT,
     min_height INT,
