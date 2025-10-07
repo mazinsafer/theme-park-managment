@@ -62,7 +62,10 @@ CREATE TABLE rides (
     location_id INT,
     PRIMARY KEY (ride_id),
     FOREIGN KEY (location_id)
-        REFERENCES location (location_id)
+        REFERENCES location (location_id),
+	CONSTRAINT chk_weight CHECK (max_weight >= 0),
+    CONSTRAINT chk_height CHECK (min_height >= 0),
+    CONSTRAINT chk_capacity CHECK (capacity >= 0)
 );
     
     
