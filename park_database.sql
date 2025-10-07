@@ -51,7 +51,7 @@ CREATE TABLE location (
 
 CREATE TABLE rides (
     ride_id INT NOT NULL,
-    ride_name VARCHAR(20),
+    ride_name VARCHAR(20) NOT NULL,
     ride_type VARCHAR(10),
     ride_status VARCHAR(10),
     max_weight INT,
@@ -175,16 +175,18 @@ CREATE TABLE inventory (
         REFERENCES vendors (vendor_id)
 );
 
-
 CREATE TABLE daily_ride (
     ride_id INT NOT NULL,
     dat_date DATE NOT NULL,
-    ride_count INT,
-    run_count INT,
+    ride_count INT UNSIGNED DEFAULT 0,
+    run_count INT UNSIGNED DEFAULT 0,
+    --- keys
     PRIMARY KEY (ride_id , dat_date),
-    FOREIGN KEY (ride_id)
-        REFERENCES rides (ride_id),
-    FOREIGN KEY (dat_date)
-        REFERENCES daily_stats (date_rec)
+    FOREIGN KEY (ride_id) REFERENCES rides (ride_id),
+    FOREIGN KEY (dat_date) REFERENCES daily_stats (date_rec)
+    --- constraints
+    CONSTRAINT chk_ride_count_positive CHECK (ride_count >= 0),
+    CONSTRAINT chk_run_count_positive CHECK (run_count >= 0)
 );
+
 
