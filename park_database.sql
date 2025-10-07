@@ -146,6 +146,7 @@ CREATE TABLE daily_stats (
     date_rec DATE NOT NULL,
     visitor_count INT,
     PRIMARY KEY (date_rec)
+	CONSTRAINT chk_count_positive CHECK (visitor_count >= 0)
 );
 
 
