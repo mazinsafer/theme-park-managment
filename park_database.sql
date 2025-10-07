@@ -139,17 +139,21 @@ CREATE TABLE daily_stats (
 
 
 CREATE TABLE vendors (
-    vendor_id INT NOT NULL,
-    vendor_name VARCHAR(20),
+    vendor_id INT NOT NULL AUTO_INCREMENT,
+    vendor_name VARCHAR(100) NOT NULL UNIQUE,
     location_id INT,
     manager_id INT,
+    --- keys
     PRIMARY KEY (vendor_id),
     FOREIGN KEY (location_id)
         REFERENCES location (location_id),
+        ON DELETE SET NULL,
+        ON UPDATE CASCADE,
     FOREIGN KEY (manager_id)
-        REFERENCES employee_demographics (employee_id)
+        REFERENCES employee_demographics (employee_id),
+        ON DELETE SET NULL,
+        ON UPDATE CASCADE
 );
-
 
 CREATE TABLE item (
     item_id INT NOT NULL,
@@ -160,7 +164,6 @@ CREATE TABLE item (
     PRIMARY KEY (item_id),
     CONSTRAINT chk_price_positive CHECK (price >= 0)
 );
-
 
 CREATE TABLE inventory (
     item_id INT NOT NULL,
