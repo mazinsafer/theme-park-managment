@@ -1,6 +1,6 @@
 Admin:
 walt@park.com
-4NYq@]ALucfb,X4
+Clubhouse123
 
 Manager:
 minnie@park.com
@@ -16,4 +16,5 @@ Clubhouse123
 
 Maintenance:
 goofy@park.com
+
 Clubhouse123
