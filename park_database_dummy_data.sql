@@ -24,7 +24,6 @@ UPDATE location SET manager_id = 2, manager_start = '2024-01-15' WHERE location_
 UPDATE location SET manager_id = 1, manager_start = '2024-01-01' WHERE location_id = 4;
 
 -- 3. EMPLOYEE_AUTH
--- Passwords here are fake. In your app, you would use bcrypt.hash('password123', 10) to generate these.
 INSERT INTO employee_auth (employee_id, password_hash) VALUES
 (1, '$2b$10$zKGpKcl0uHKA9Tg1GY8Jv.w8T0glQh/v7wFckZTjnyD0hSZJ/gkZu'),
 (2, '$2b$10$zKGpKcl0uHKA9Tg1GY8Jv.w8T0glQh/v7wFckZTjnyD0hSZJ/gkZu'),
