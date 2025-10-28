@@ -30,11 +30,7 @@
             <p class="error"><%= error %></p>
         <% } %>
 
-        <div class="info-box">
-            Note: This report shows granular attendance data from the **visits** table. The chart displays visits grouped by the selected time period (Hour, Day, or Month). The location filter is decorative until the database schema is updated.
-        </div>
-
-        <form action="/reports/attendance" method="POST">
+               <form action="/reports/attendance" method="POST">
             <div class="form-grid">
                 <div>
                     <label for="selected_date">Select Date:</label>
@@ -50,18 +46,18 @@
                     </select>
                 </div>
                 
-                <%# Location field remains %>
+                <%# MODIFIED: Changed filter from Location to Membership Type %>
                 <div>
-                    <label for="location_id">Location (Park-Wide Only):</label>
-                    <select id="location_id" name="location_id">
-                        <option value="">Park-Wide (Default)</option>
-                        <% locations.forEach(location => { %>
-                            <option value="<%= location.location_id %>" <%= location.location_id == location_id ? 'selected' : '' %>><%= location.location_name %></option>
+                    <label for="membership_type">Filter by Membership:</label>
+                    <select id="membership_type" name="membership_type">
+                        <% membership_types.forEach(type => { %>
+                            <option value="<%= type %>" <%= type === membership_type ? 'selected' : '' %>>
+                                <%= type %>
+                            </option>
                         <% }); %>
                     </select>
                 </div>
 
-                <%# Button moved to align better %>
                 <div style="grid-column: 4; align-self: end;">
                     <button type="submit">Generate Report</button>
                 </div>
@@ -78,6 +74,11 @@
                 const labels = data.map(item => item.label);
                 const counts = data.map(item => item.count);
                 
+                // NEW: Dynamic arrays for styling spike points
+                const pointColors = data.map(item => item.isSpike ? 'rgba(220, 53, 69, 1)' : 'rgba(0, 123, 255, 1)'); // Red for spike, Blue for normal
+                const pointRadii = data.map(item => item.isSpike ? 8 : 4); // Large radius for spike
+                const pointBorderColors = data.map(item => item.isSpike ? 'rgba(220, 53, 69, 1)' : 'rgba(75, 192, 192, 1)');
+
                 const ctx = document.getElementById('attendanceChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'line', 
@@ -91,7 +92,11 @@
                             borderWidth: 2,
                             tension: 0.3,
                             fill: true,
-                            pointRadius: 5
+                            // NEW: Apply dynamic point styling arrays
+                            pointBackgroundColor: pointColors, 
+                            pointBorderColor: pointBorderColors,
+                            pointRadius: pointRadii,
+                            pointHoverRadius: 10 // Highlight on hover
                         }]
                     },
                     options: {
@@ -107,7 +112,6 @@
                             x: {
                                 title: {
                                     display: true,
-                                    // Use the labelFormat passed from the backend
                                     text: '<%= labelFormat %>' 
                                 }
                             }
@@ -115,7 +119,7 @@
                     }
                 });
             </script>
-        <% } else if (attendance_data && attendance_data.length === 0) { %>
+       <% } else if (attendance_data && attendance_data.length === 0) { %>
             <p style="text-align: center; font-weight: bold; margin-top: 2em;">No attendance data found for the selected date range.</p>
         <% } %>
 
