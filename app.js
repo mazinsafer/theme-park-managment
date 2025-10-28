@@ -1207,16 +1207,17 @@ const getReportSettings = (selectedDate, grouping) => {
 
 app.get('/reports/attendance', isAuthenticated, canViewReports, async (req, res) => {
   try {
-    const [locations] = await pool.query('SELECT location_id, location_name FROM location');
-    const defaultDate = '2025-10-20'; // Use a date with dummy data for better demo
+    // MODIFIED: Define all possible membership types for the dropdown filter
+    const membership_types = ['All Visitors', 'Non-Member', 'Individual', 'Family', 'Gold', 'Platinum'];
+    const defaultDate = '2025-10-20';
 
     res.render('attendance-report', {
-      locations: locations,
+      membership_types: membership_types, // Pass the list of types
       selected_date: defaultDate,
       grouping: 'day',
-      location_id: '',
+      membership_type: 'All Visitors', // Default selection
       attendance_data: null,
-      labelFormat: 'Time Period', // Default label
+      labelFormat: 'Time Period',
       error: null
     });
   } catch (error) {
@@ -1226,57 +1227,77 @@ app.get('/reports/attendance', isAuthenticated, canViewReports, async (req, res)
 });
 
 app.post('/reports/attendance', isAuthenticated, canViewReports, async (req, res) => {
-  const { selected_date, grouping, location_id } = req.body;
+  const membership_types = ['All Visitors', 'Non-Member', 'Individual', 'Family', 'Gold', 'Platinum'];
+
+  const { selected_date, grouping, membership_type } = req.body;
 
   try {
     const { startDate, endDate, sqlDateFormat, labelFormat } = getReportSettings(selected_date, grouping);
 
-    // --- 1. Dynamic SQL Query: Counts visits grouped by the required time format from the 'visits' table ---
+    // --- DYNAMIC SQL CONSTRUCTION ---
+    let whereClause = `WHERE DATE(v.visit_date) BETWEEN ? AND ? `;
+    let joinClause = ``;
+    let params = [sqlDateFormat, startDate, endDate];
+
+    if (membership_type === 'Non-Member') {
+      whereClause += `AND v.membership_id IS NULL `;
+    } else if (membership_type !== 'All Visitors') {
+      joinClause = `JOIN membership m ON v.membership_id = m.membership_id`;
+      whereClause += `AND m.member_type = ? `;
+      params.push(membership_type);
+    }
+
+    // --- 1. Dynamic SQL Query ---
     const reportQuery = `
             SELECT 
-                DATE_FORMAT(visit_date, ?) as report_interval, 
-                COUNT(visit_id) as total_count
-            FROM visits 
-            WHERE DATE(visit_date) BETWEEN ? AND ? 
+                DATE_FORMAT(v.visit_date, ?) as report_interval, 
+                COUNT(v.visit_id) as total_count
+            FROM visits v 
+            ${joinClause}
+            ${whereClause}
             GROUP BY report_interval
             ORDER BY report_interval
         `;
-    const [reportData] = await pool.query(reportQuery, [sqlDateFormat, startDate, endDate]);
+    const [reportData] = await pool.query(reportQuery, params);
 
-    // --- 2. Format data for the chart ---
+    // --- 2. Calculate Average and Identify Spikes (NEW LOGIC) ---
+    const totalSum = reportData.reduce((sum, row) => sum + row.total_count, 0);
+    const avgCount = reportData.length > 0 ? totalSum / reportData.length : 0;
+    // Define a spike as any count 25% above the average
+    const spikeThreshold = avgCount * 1.25;
+
+    // --- 3. Format data for the chart and flag spikes ---
     const chartData = reportData.map(row => ({
       label: row.report_interval,
-      count: row.total_count
+      count: row.total_count,
+      // Flag as spike if count exceeds threshold and we have enough data points (e.g., > 3)
+      isSpike: row.total_count >= spikeThreshold && reportData.length > 3
     }));
 
-    const [locations] = await pool.query('SELECT location_id, location_name FROM location');
-
     res.render('attendance-report', {
-      locations: locations,
+      membership_types: membership_types,
       selected_date: selected_date,
       grouping: grouping,
-      location_id: location_id,
+      membership_type: membership_type,
       attendance_data: chartData,
-      labelFormat: labelFormat, // Pass the dynamic label format to the EJS view
+      labelFormat: labelFormat,
       error: null
     });
 
   } catch (error) {
     console.error("Error generating attendance report:", error);
-    const [locations] = await pool.query('SELECT location_id, location_name FROM location');
+
     res.render('attendance-report', {
-      locations: locations,
+      membership_types: membership_types,
       selected_date: selected_date,
       grouping: grouping,
-      location_id: location_id,
+      membership_type: membership_type,
       attendance_data: null,
       labelFormat: 'Time Period',
       error: `Error generating report: ${error.message}`
     });
   }
 });
-
-// ... (omitting the rest of the file)
 
 // --- Start Server ---
 app.listen(port, () => {
