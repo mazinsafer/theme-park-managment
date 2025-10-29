@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Park Attendance Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 1000px; margin: 2em auto; background: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #444; border-bottom: 2px solid #eee; padding-bottom: 0.5em; }
+        form { margin-bottom: 2em; padding: 1.5em; border: 1px solid #ddd; border-radius: 4px; background-color: #fafafa; }
+        /* UPDATED: Change to 4 columns for form elements */
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; align-items: end; }
+        .form-grid label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-grid input[type="date"], .form-grid select { width: 100%; padding: 10px; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+        .full-width { grid-column: 1 / -1; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; font-size: 1em; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        .chart-container { margin-top: 2em; border: 1px solid #ddd; padding: 1em; background: #fff; border-radius: 4px; }
+        .info-box { color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 1em; border-radius: 4px; margin-bottom: 1.5em; font-weight: bold; }
+        .error { color: #d9534f; font-weight: bold; background-color: #f2dede; padding: 1em; border-radius: 4px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+    <div class="container">
+        <h1>Park Attendance Report</h1>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+               <form action="/reports/attendance" method="POST">
+            <div class="form-grid">
+                <div>
+                    <label for="selected_date">Select Date:</label>
+                    <input type="date" id="selected_date" name="selected_date" value="<%= selected_date %>" required>
+                </div>
+                <div>
+                    <label for="grouping">Group By:</label>
+                    <select id="grouping" name="grouping" required>
+                        <option value="day" <%= grouping === 'day' ? 'selected' : '' %>>Day (Shows Hourly)</option>
+                        <option value="week" <%= grouping === 'week' ? 'selected' : '' %>>Week (Shows Daily)</option>
+                        <option value="month" <%= grouping === 'month' ? 'selected' : '' %>>Month (Shows Daily)</option>
+                        <option value="year" <%= grouping === 'year' ? 'selected' : '' %>>Year (Shows Monthly)</option>
+                    </select>
+                </div>
+                
+                <%# MODIFIED: Changed filter from Location to Membership Type %>
+                <div>
+                    <label for="membership_type">Filter by Membership:</label>
+                    <select id="membership_type" name="membership_type">
+                        <% membership_types.forEach(type => { %>
+                            <option value="<%= type %>" <%= type === membership_type ? 'selected' : '' %>>
+                                <%= type %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div style="grid-column: 4; align-self: end;">
+                    <button type="submit">Generate Report</button>
+                </div>
+            </div>
+        </form>
+
+        <% if (attendance_data && attendance_data.length > 0) { %>
+            <div class="chart-container">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+            <script>
+                const data = <%- JSON.stringify(attendance_data) %>;
+                const labels = data.map(item => item.label);
+                const counts = data.map(item => item.count);
+                
+                // NEW: Dynamic arrays for styling spike points
+                const pointColors = data.map(item => item.isSpike ? 'rgba(220, 53, 69, 1)' : 'rgba(0, 123, 255, 1)'); // Red for spike, Blue for normal
+                const pointRadii = data.map(item => item.isSpike ? 8 : 4); // Large radius for spike
+                const pointBorderColors = data.map(item => item.isSpike ? 'rgba(220, 53, 69, 1)' : 'rgba(75, 192, 192, 1)');
+
+                const ctx = document.getElementById('attendanceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line', 
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Visitor Count',
+                            data: counts,
+                            borderColor: 'rgba(75, 192, 192, 1)', 
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            // NEW: Apply dynamic point styling arrays
+                            pointBackgroundColor: pointColors, 
+                            pointBorderColor: pointBorderColors,
+                            pointRadius: pointRadii,
+                            pointHoverRadius: 10 // Highlight on hover
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Total Visitors'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '<%= labelFormat %>' 
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+       <% } else if (attendance_data && attendance_data.length === 0) { %>
+            <p style="text-align: center; font-weight: bold; margin-top: 2em;">No attendance data found for the selected date range.</p>
+        <% } %>
+
+    </div>
+</body>
+</html>
